@@ -1,0 +1,2 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/gustavo/Documents/test_manim/media/videos/example/1080p60/partial_movie_files/Bubble_sort/1413466013_527972155_223132457.mp4'
