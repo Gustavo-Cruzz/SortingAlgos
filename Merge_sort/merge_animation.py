@@ -1,11 +1,18 @@
 from manim import *
-
+from numpy import array
 
 class CreateVector(Scene):
 
-    def construct(self):
+    def construct(self):        
+        divide_up = array((0.0, 1.5, 0.0))
+        divide_upl = array((-.5, 1.0, 0.0))
+        divide_upr = array((.5, 1.0, 0.0))
 
         def init_array():
+            """#TODO
+
+            """            
+
             squares = []
             texts = []
 
@@ -27,20 +34,63 @@ class CreateVector(Scene):
             self.squares = squares
             self.texts = texts
 
-        def clone_up():
-            squares_new = [i.copy() for i in self.squares] # Copies individual items
-            texts_new = [i.copy() for i in self.texts]
-        
-            for i, j in zip(squares_new, texts_new):
-                self.play(Create(i), run_time=.2)
-                self.play(i.animate.shift(UP),  
-                        j.animate.shift(UP),
-                        run_time=.2)
 
-            self.squares = squares_new
-            self.texts = texts_new
+        def join_arr_group(group, new_scale, movement, displace, anim_time=.2):
+            """Moves the cloned arrays up a single unit and
+               makes sure they are close to their respective group.
+
+            Args:
+                group (list[tuple]): Contains all elements in the animated array
+                new_scale (int): The new scale for the cloned array
+                movement (np.ndarray): Coordinates for individual element's movement
+                displace (float): How much to add to movement in order to make itens 
+                                  closely bounded
+                anim_time (float, optional): How fast should the animations be. Defaults to .2.
+            """            
+            last = None
+
+            for (i, j) in group:
+                print(i, j)
+                self.play(Create(i), run_time=anim_time)
+                self.play(i.animate.shift(divide_up).scale(new_scale),  
+                          j.animate.shift(divide_up).scale(new_scale),
+                          run_time=anim_time)
+                
+                if last:
+                    self.play(i.animate.next_to(last, movement + displace),  
+                              j.animate.next_to(last, movement),
+                              run_time=anim_time)
+                last = i
+
+
+        def clone_up(new_scale, anim_time=.2):
+            """Makes a copy of each square and text.
+               After which calls 'join_arr_group' and
+               redefines the most recent elements in array
+
+            Args:
+                new_scale (int): The new scale for the cloned array
+                anim_time (float, optional): How fast should the animations be. Defaults to .2.
+            """            
+            
+            group = [(i.copy(), j.copy()) for i,j in zip(self.squares, self.texts)]
+
+            group_size = int((len(group)/2))
+            displace = np.array((.66, 0, 0))
+
+            join_arr_group(group[:group_size], new_scale, RIGHT, -displace, anim_time)
+            join_arr_group(group[:group_size-1:-1], new_scale, LEFT, displace, anim_time)
+
+            self.squares = [i for (i,j) in group]
+            self.texts = [j for (i,j) in group]
 
         def reposition(n1, n2):
+            """Animates the shuffling of two elements in array
+
+            Args:
+                n1 (int): The left-most index to shuffle to the right
+                n2 (int): The right-most index to shuffle to the right
+            """            
             self.play(self.squares[n1].animate.set_fill(YELLOW),
                       self.squares[n2].animate.set_fill(YELLOW))
 
@@ -54,25 +104,9 @@ class CreateVector(Scene):
             
 
         init_array()
-        clone_up()
+        clone_up(new_scale=.7)
+        self.wait(1)
 
-        reposition(0,1)
-        clone_up()
-        reposition(2,3)
-
-
-
-
-
-
-class SquareToCircle(Scene):
-    def construct(self):
-        circle = Circle()
-        square = Square()
-        square.flip(RIGHT)
-        square.rotate(-3 * TAU / 8)
-        circle.set_fill(PINK, opacity=0.5)
-
-        self.play(Create(square))
-        self.play(Transform(square, circle))
-        self.play(FadeOut(square))
+        # reposition(0,1)
+        # clone_up()
+        # reposition(2,3)
