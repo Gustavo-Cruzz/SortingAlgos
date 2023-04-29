@@ -84,7 +84,7 @@ class CreateVector(Scene):
             self.squares = [i for (i,j) in group]
             self.texts = [j for (i,j) in group]
 
-        def reposition(n1, n2):
+        def reposition(n1, n2, movr, movl):
             """Animates the shuffling of two elements in array
 
             Args:
@@ -94,19 +94,23 @@ class CreateVector(Scene):
             self.play(self.squares[n1].animate.set_fill(YELLOW),
                       self.squares[n2].animate.set_fill(YELLOW))
 
-            self.play(self.texts[n1].animate.shift(RIGHT),
-                    self.texts[n2].animate.shift(LEFT))
+            self.play(self.texts[n1].animate.shift((movr * RIGHT)),
+                    self.texts[n2].animate.shift(movl * LEFT))
     
             self.texts[n1], self.texts[n2] = self.texts[n2], self.texts[n1]
 
             self.play(self.squares[n1].animate.set_fill(BLUE),
-                      self.squares[n2].animate.set_fill(BLUE))
+                       self.squares[n2].animate.set_fill(BLUE))
+
             
 
         init_array()
         clone_up(new_scale=.7)
         self.wait(1)
 
-        # reposition(0,1)
-        # clone_up()
-        # reposition(2,3)
+        reposition(0,1, 0.75 , 0.8)
+        clone_up(0.8)
+        reposition(2,3, 0.6, 0.7)
+        clone_up(new_scale=1)
+        reposition(2, 4, 1, 1)
+        reposition(3, 4 ,0.75, 0.8)
