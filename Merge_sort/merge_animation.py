@@ -112,5 +112,5 @@ class CreateVector(Scene):
         clone_up(0.8)
         reposition(2,3, 0.6, 0.7)
         clone_up(new_scale=1)
-        reposition(2, 4, 1, 1)
-        reposition(3, 4 ,0.75, 0.8)
+        reposition(2, 4, 1.2, 1.2)
+        reposition(3, 4 ,0.5, 0.58)
