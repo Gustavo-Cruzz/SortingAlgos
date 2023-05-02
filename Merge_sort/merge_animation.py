@@ -29,8 +29,8 @@ class CreateVector(Scene):
 
                 self.play(Create(VGroup(square, ft)), runtime = .5)
 
-                self.play(square.animate.to_edge(DL).shift(RIGHT*i), 
-                        ft.animate.to_edge(DL + offset).shift(RIGHT*i + offset+.04), 
+                self.play(square.animate.to_edge(DL).shift(RIGHT*i).shift(RIGHT), 
+                        ft.animate.to_edge(DL + offset).shift(RIGHT*i + offset+.04).shift(RIGHT), 
                         run_time = .5)
 
                 squares.append(square)
@@ -92,14 +92,14 @@ class CreateVector(Scene):
             join_arr_group(group[:group_size], new_scale, RIGHT, -displace, anim_time)
             join_arr_group(group[:group_size-1:-1], new_scale, LEFT, displace, anim_time)
             
-            
             self.length /= 2
             if self.length < 1: self.length = 1
             self.iter += 1
             self.squares[self.iter] = [i for (i,j) in group]
             self.texts[self.iter] = [j for (i,j) in group]
 
-        def reposition(n1, n2, movr, movl, move=True):
+
+        def reposition(n1, n2, movr, movl, move=True, translocate=False):
             """Animates the shuffling of two elements in array
 
             Args:
@@ -115,11 +115,33 @@ class CreateVector(Scene):
         
                 self.texts[self.iter][n1], self.texts[self.iter][n2] = self.texts[self.iter][n2], self.texts[self.iter][n1]
 
+
             self.play(self.squares[self.iter][n1].animate.set_fill(BLUE),
                        self.squares[self.iter][n2].animate.set_fill(BLUE))
 
-            
+        
+        def low_array():
+            last = self.squares[self.iter-1]
+            for (i,j, k,l) in zip(self.squares[self.iter], self.texts[self.iter], self.squares[self.iter-1], self.texts[self.iter-1]):
+                
+                self.play(i.animate.move_to(k).scale(1.2), 
+                          j.animate.move_to(l).scale(1.2),
+                          FadeOut(k, shift=DOWN),
+                          FadeOut(l, shift=DOWN),
+                          run_time=.5)
 
+            self.iter -= 1
+            self.squares[self.iter] = self.squares[self.iter +1]
+            self.texts[self.iter] = self.texts[self.iter +1]
+
+        def delete_low_text():
+            for k in self.texts[self.iter-1]:
+                self.play(FadeOut(k, shift=DOWN), run_time=.2)
+            
+        def delete_squares(group):
+            for k in group:
+                self.play(FadeOut(k, shift=DOWN), run_time=.2)
+            
         init_array()
         # clone_up(new_scale=.7)
         # reposition(0, 1, 0.75, 0.8)
@@ -157,13 +179,78 @@ class CreateVector(Scene):
         self.squares[self.iter] = [i for (i,j) in group]
         self.texts[self.iter] = [j for (i,j) in group]
 
-        self.wait(1)
 
         reposition(0, 1, 0.75, 0.7)
         reposition(2, 3, 0.88, 0.7)
         reposition(4, 5, 0.65, 0.7)
         reposition(6, 7, 0.65, 0.7)
-        # reposition(2, 3, 0.6, 0.7)
-        # reposition(2, 3, 0.6, 0.7)
-        # reposition(2, 3, 0.6, 0.7)
-        # reposition(2, 3, 0.6, 0.7)
+
+        # destroy_group()
+
+        # low_array()
+        delete_low_text()
+
+        # move_text(UP)
+        reposition(0, 2, 0.85, 0.7, move=False)
+        self.play(self.texts[self.iter][2].animate.move_to(self.squares[self.iter-1][0]))
+    
+        
+        reposition(0, 3, 0.9, 0.75, move=False)
+        self.play(self.texts[self.iter][3].animate.move_to(self.squares[self.iter-1][1]))        
+        
+        self.play(self.texts[self.iter][0].animate.move_to(self.squares[self.iter-1][2]),
+                  self.texts[self.iter][1].animate.move_to(self.squares[self.iter-1][3]))
+
+        delete_squares(self.squares[self.iter][:4])
+        temp0 = self.texts[self.iter][0]
+        temp1 = self.texts[self.iter][1]
+        self.texts[self.iter][0] = self.texts[self.iter][2]
+        self.texts[self.iter][1] = self.texts[self.iter][3]
+        self.texts[self.iter][2] = temp0
+        self.texts[self.iter][3] = temp1
+
+
+        reposition(4, 6, 0.75, 0.8, move=False)
+        self.play(self.texts[self.iter][6].animate.move_to(self.squares[self.iter-1][4]))
+        
+        reposition(4, 7, 0.75, 0.8, move=False)
+        self.play(self.texts[self.iter][7].animate.move_to(self.squares[self.iter-1][5]))
+     
+        self.play(self.texts[self.iter][4].animate.move_to(self.squares[self.iter-1][6]),
+                  self.texts[self.iter][5].animate.move_to(self.squares[self.iter-1][7]))
+
+        
+        delete_squares( self.squares[self.iter][4:])
+        self.iter -= 1
+        self.texts[self.iter] = self.texts[self.iter+1]
+        
+        temp4 = self.texts[self.iter][4]
+        temp5 = self.texts[self.iter][5]
+        self.texts[self.iter][4] = self.texts[self.iter][6]
+        self.texts[self.iter][5] = self.texts[self.iter][7]
+        self.texts[self.iter][6] = temp4
+        self.texts[self.iter][7] = temp5
+
+        delete_low_text()
+
+        reposition(0, 4, 0.85, 0.7, move=False)
+        self.play(self.texts[self.iter][4].animate.move_to(self.squares[self.iter-1][0]))
+        
+        reposition(0, 5, 0.9, 0.75, move=False)        
+        self.play(self.texts[self.iter][5].animate.move_to(self.squares[self.iter-1][1]))
+        
+        reposition(0, 6, 0.9, 0.75, move=False)
+        self.play(self.texts[self.iter][6].animate.move_to(self.squares[self.iter-1][2]))
+
+        reposition(0, 7, 0.9, 0.75, move=False)
+        self.play(self.texts[self.iter][7].animate.move_to(self.squares[self.iter-1][3]))       
+        
+        
+        self.play(self.texts[self.iter][0].animate.move_to(self.squares[self.iter-1][4]),
+                   self.texts[self.iter][1].animate.move_to(self.squares[self.iter-1][5]),
+                   self.texts[self.iter][2].animate.move_to(self.squares[self.iter-1][6]),
+                   self.texts[self.iter][3].animate.move_to(self.squares[self.iter-1][7]))
+
+
+        delete_squares(self.squares[self.iter])
+        self.wait(2)
